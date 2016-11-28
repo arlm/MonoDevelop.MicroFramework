@@ -19,10 +19,10 @@ namespace MonoDevelop.MicroFramework
 {
 	public class MicroFrameworkProject : DotNetProject
 	{
-		public override void Dispose()
+		protected override void OnDispose()
 		{
 			ExecutionTargetsManager.DeviceListChanged -= OnExecutionTargetsChanged;
-			base.Dispose();
+			base.OnDispose();
 		}
 
 		public MicroFrameworkProject()
@@ -35,8 +35,8 @@ namespace MonoDevelop.MicroFramework
 		{
 		}
 
-		public MicroFrameworkProject(string languageName, ProjectCreateInformation projectCreateInfo, XmlElement projectOptions)
-			: base(languageName, projectCreateInfo, projectOptions)
+		public MicroFrameworkProject(string languageName, params string[] flavorIds)
+			: base(languageName, flavorIds)
 		{
 		}
 
@@ -89,6 +89,12 @@ namespace MonoDevelop.MicroFramework
 		{
 			return new TargetFrameworkMoniker(".NETMicroFramework", "4.3");
 		}
+
+		protected override ClrVersion [] OnGetSupportedClrVersions ()
+		{
+			return new [] { ClrVersion.Default };
+		}
+
 		//Seems like VS is ignoring this
 		//So we won't implement it my guess is they removed becauese it was causing
 		//problems with version control and multi users projects
@@ -127,6 +133,15 @@ namespace MonoDevelop.MicroFramework
 				OutputDirectory = configuration.OutputDirectory,
 				ReferencedAssemblies = references
 			};
+		}
+
+		protected override DotNetCompilerParameters OnCreateCompilationParameters (DotNetProjectConfiguration config, ConfigurationKind kind)
+		{
+			return new CompilerParameters ();
+		}
+
+		class CompilerParameters : DotNetCompilerParameters
+		{
 		}
 	}
 }
